@@ -150,6 +150,7 @@ class Program
                         "-previous",
                         "-pause",
                         "-sessions",
+                        "-seek",
                         "exit"
                     }
                 });
