@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36811.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickMedia", "QuickMedia\QuickMedia.csproj", "{FAE51272-0A48-42ED-A780-906044FF662E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAE51272-0A48-42ED-A780-906044FF662E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAE51272-0A48-42ED-A780-906044FF662E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAE51272-0A48-42ED-A780-906044FF662E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAE51272-0A48-42ED-A780-906044FF662E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F0BBD18C-810F-4116-8E6A-A81B8025E977}
+	EndGlobalSection
+EndGlobal
