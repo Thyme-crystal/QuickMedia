@@ -12,7 +12,7 @@ Commands:
                         "-album",
                         "-timeline",
                         "-skip",
-                        "-previous",
+                        "-back",
                         "-pause",
                         "-sessions",
                         "-seek",
