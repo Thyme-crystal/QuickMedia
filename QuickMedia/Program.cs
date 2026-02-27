@@ -6,10 +6,7 @@ using Windows.Media.Control;
 
 class Program
 {
-#pragma warning disable CS8618 
-    private static GlobalSystemMediaTransportControlsSessionManager _manager;
-#pragma warning restore CS8618 
-    static bool IsActive = true;
+    private static GlobalSystemMediaTransportControlsSessionManager? _manager;
 
 
     static async Task Main()
@@ -40,7 +37,6 @@ class Program
         if (session == null)
         {
             WriteJson(new { status = "No active media session" });
-            IsActive = false;
             return;
         }
 
