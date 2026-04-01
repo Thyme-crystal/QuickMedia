@@ -6,9 +6,7 @@ using Windows.Media.Control;
 
 class Program
 {
-#pragma warning disable CS8618 
-    private static GlobalSystemMediaTransportControlsSessionManager _manager;
-#pragma warning restore CS8618 
+    private static GlobalSystemMediaTransportControlsSessionManager? _manager;
 
 
     static async Task Main()
@@ -23,8 +21,6 @@ class Program
 
             try
             {
-                if (_manager == null)
-                    _manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
                 await ProcessComand(input);
             }
             catch (Exception ex)
@@ -36,8 +32,7 @@ class Program
 
     private static async Task ProcessComand(string command)
     {
-        var manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
-        var session = manager.GetCurrentSession() ?? (manager.GetSessions().Count > 0 ? manager.GetSessions()[0] : null);
+        var session = _manager.GetCurrentSession() ?? (_manager.GetSessions().Count > 0 ? _manager.GetSessions()[0] : null);
 
         if (session == null)
         {
@@ -110,12 +105,22 @@ class Program
                 WriteJson(new { status = "Previous track" });
                 break;
 
-            case "-pause":
+            case "-toggle":
                 await session.TryTogglePlayPauseAsync();
                 WriteJson(new { status = "Toggled pause" });
                 break;
 
-            case "-seek":
+            case "-pause":
+                await session.TryPauseAsync();
+                WriteJson(new { status = "Paused" });
+                break;
+
+            case "-play":
+                await session.TryPlayAsync();
+                WriteJson(new { status = "Playing" });
+                break;
+
+            /*case "-seek":
                 {
                     Console.WriteLine("Enter Time");
                     string? timeInput = Console.ReadLine();
@@ -130,7 +135,7 @@ class Program
                         WriteJson(new { error = "Not a Correct input" });
                     }
                     break;
-                }
+                }*/
 
             case "-sessions":
                 WriteJson(new
@@ -153,20 +158,38 @@ class Program
                         "-skip",
                         "-back",
                         "-pause",
+                        "-resume",
+                        "-toggle",
                         "-sessions",
-                        "-seek",
+                        "-seek:<seconds>",
                         "exit"
                     }
                 });
                 break;
 
             default:
-                WriteJson(new { error = "Unknown command" });
+                if (command.StartsWith("-seek:"))
+                {
+                    string raw = command["-seek:".Length..]; // alles nach dem Doppelpunkt
+                    if (long.TryParse(raw, out long seconds))
+                    {
+                        await session.TryChangePlaybackPositionAsync(TimeSpan.FromSeconds(seconds).Ticks);
+                        WriteJson(new { status = "Seeked", position = seconds });
+                    }
+                    else
+                    {
+                        WriteJson(new { error = "Invalid seek value", input = raw });
+                    }
+                }
+                else
+                {
+                    WriteJson(new { error = "Unknown command" });
+                }
                 break;
         }
     }
 
-    private static GlobalSystemMediaTransportControlsSession? GetSession()
+    /*private static GlobalSystemMediaTransportControlsSession? GetSession()
     {
         var current = _manager.GetCurrentSession();
         if (current != null)
@@ -174,7 +197,7 @@ class Program
 
         var sessions = _manager.GetSessions();
         return sessions.Count > 0 ? sessions[0] : null;
-    }
+    }*/
 
     private static async Task<string?> GetThumbnail(GlobalSystemMediaTransportControlsSessionMediaProperties props)
     {
