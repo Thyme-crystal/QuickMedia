@@ -9,7 +9,6 @@ class Program
 #pragma warning disable CS8618 
     private static GlobalSystemMediaTransportControlsSessionManager _manager;
 #pragma warning restore CS8618 
-    static bool IsActive = true;
 
 
     static async Task Main()
@@ -24,30 +23,37 @@ class Program
 
             try
             {
+                if (_manager == null)
+                    _manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
                 await ProcessComand(input);
             }
             catch (Exception ex)
             {
-                WriteJson(new { error = ex.Message });
+                WriteJson(new { error = ex.ToString() });
             }
         }
     }
 
     private static async Task ProcessComand(string command)
     {
-        var session = GetSession();
+        var manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+        var session = manager.GetCurrentSession() ?? (manager.GetSessions().Count > 0 ? manager.GetSessions()[0] : null);
 
         if (session == null)
         {
             WriteJson(new { status = "No active media session" });
-            IsActive = false;
             return;
         }
 
         var props = await session.TryGetMediaPropertiesAsync();
+        if (props == null)
+        {
+            WriteJson(new { error = "meta not available" });
+            return;
+        }
+
         var playback = session.GetPlaybackInfo();
         var timeline = session.GetTimelineProperties();
-
         switch (command)
         {
             case "-all":
@@ -66,10 +72,8 @@ class Program
                 break;
 
             case "-cover":
-                WriteJson(new
-                {
-                    ThumbnailBase64 = await GetThumbnail(props)
-                });
+                string? base64 = await GetThumbnail(props);
+                WriteJson(new { ThumbnailBase64 = base64 });
                 break;
 
             case "-name":
@@ -117,8 +121,8 @@ class Program
                     string? timeInput = Console.ReadLine();
                     if (long.TryParse(timeInput, out long seconds))
                     {
-                        seconds *= 9999999; // yes you need to do that for spotify and etc. yes
-                        await session.TryChangePlaybackPositionAsync(seconds);
+                        long ticks = TimeSpan.FromSeconds(seconds).Ticks;
+                        await session.TryChangePlaybackPositionAsync(ticks);
                         WriteJson(new { status = "Seeked", position = seconds });
                     }
                     else
@@ -174,13 +178,21 @@ class Program
 
     private static async Task<string?> GetThumbnail(GlobalSystemMediaTransportControlsSessionMediaProperties props)
     {
-        if (props.Thumbnail == null)
-            return null;
+        if (props?.Thumbnail == null) return null;
 
-        using var stream = await props.Thumbnail.OpenReadAsync();
-        using var ms = new MemoryStream();
-        await stream.AsStreamForRead().CopyToAsync(ms);
-        return Convert.ToBase64String(ms.ToArray());
+        try
+        {
+            using var stream = await props.Thumbnail.OpenReadAsync();
+            using var input = stream.AsStreamForRead();
+            using var ms = new MemoryStream();
+
+            await input.CopyToAsync(ms);
+            return Convert.ToBase64String(ms.ToArray());
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static void WriteJson(object data)
