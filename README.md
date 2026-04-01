@@ -1,4 +1,4 @@
-# QuickMedia. inspired by iidk's QuickSong
+# QuickMedia.
 
 A media controller for Windows, inspired by iidk's QuickSong, that stays open instead of closing immediately, responds to commands and provides playback information in real time. 
 
@@ -14,6 +14,8 @@ Commands:
                         "-skip",
                         "-back",
                         "-pause",
+                        "-resume",
+                        "-toggle",
                         "-sessions",
-                        "-seek",
+                        "-seek:<seconds>",
                         "exit"
