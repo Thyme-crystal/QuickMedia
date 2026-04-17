@@ -170,7 +170,7 @@ class Program
             default:
                 if (command.StartsWith("-seek:"))
                 {
-                    string raw = command["-seek:".Length..]; // alles nach dem Doppelpunkt
+                    string raw = command["-seek:".Length..];
                     if (long.TryParse(raw, out long seconds))
                     {
                         await session.TryChangePlaybackPositionAsync(TimeSpan.FromSeconds(seconds).Ticks);
