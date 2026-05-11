@@ -8,24 +8,30 @@ class Program
 {
     private static GlobalSystemMediaTransportControlsSessionManager? _manager;
 
-
-    static async Task Main()
+    [MTAThread]
+    static void Main()
     {
-        _manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+        _manager = GlobalSystemMediaTransportControlsSessionManager
+            .RequestAsync()
+            .AsTask()
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
 
         while (true)
         {
-            string input = Console.ReadLine().Trim().ToLower();
-            if (string.IsNullOrEmpty(input) || input == "exit")
-                break;
+            string? input = Console.ReadLine();
+            if (input == null) break;
+            input = input.Trim().ToLower();
+            if (string.IsNullOrEmpty(input) || input == "exit") break;
 
             try
             {
-                await ProcessComand(input);
+                ProcessComand(input).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
-                WriteJson(new { error = ex.ToString() });
+                WriteJson(new { error = ex.Message });
             }
         }
     }
@@ -144,6 +150,13 @@ class Program
                 });
                 break;
 
+            case "-currentsession":
+                WriteJson(new
+                {
+                   CurrentSession = _manager.GetCurrentSession()
+                });
+                break;
+
             case "-help":
                 WriteJson(new
                 {
@@ -188,16 +201,6 @@ class Program
                 break;
         }
     }
-
-    /*private static GlobalSystemMediaTransportControlsSession? GetSession()
-    {
-        var current = _manager.GetCurrentSession();
-        if (current != null)
-            return current;
-
-        var sessions = _manager.GetSessions();
-        return sessions.Count > 0 ? sessions[0] : null;
-    }*/
 
     private static async Task<string?> GetThumbnail(GlobalSystemMediaTransportControlsSessionMediaProperties props)
     {
