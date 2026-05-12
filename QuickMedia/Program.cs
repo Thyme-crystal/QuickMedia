@@ -11,23 +11,18 @@ class Program
     [MTAThread]
     static void Main()
     {
-        _manager = GlobalSystemMediaTransportControlsSessionManager
-            .RequestAsync()
-            .AsTask()
-            .ConfigureAwait(false)
-            .GetAwaiter()
-            .GetResult();
+        _manager = GlobalSystemMediaTransportControlsSessionManager.RequestAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
 
         while (true)
         {
             string? input = Console.ReadLine();
             if (input == null) break;
             input = input.Trim().ToLower();
-            if (string.IsNullOrEmpty(input) || input == "exit") break;
+            if (string.IsNullOrEmpty(input) || (input == "exit" || input == "-exit")) break;
 
             try
             {
-                ProcessComand(input).ConfigureAwait(false).GetAwaiter().GetResult();
+                ProcessCommand(input).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -36,9 +31,9 @@ class Program
         }
     }
 
-    private static async Task ProcessComand(string command)
+    private static async Task ProcessCommand(string command)
     {
-        var session = _manager.GetCurrentSession() ?? (_manager.GetSessions().Count > 0 ? _manager.GetSessions()[0] : null);
+        var session = _manager?.GetCurrentSession() ?? (_manager?.GetSessions().Count > 0 ? _manager.GetSessions()[0] : null);
 
         if (session == null)
         {
@@ -146,14 +141,14 @@ class Program
             case "-sessions":
                 WriteJson(new
                 {
-                    Count = _manager.GetSessions().Count
+                    Count = _manager?.GetSessions().Count
                 });
                 break;
 
             case "-currentsession":
                 WriteJson(new
                 {
-                   CurrentSession = _manager.GetCurrentSession()
+                   CurrentSession = _manager?.GetCurrentSession()
                 });
                 break;
 
@@ -171,10 +166,11 @@ class Program
                         "-skip",
                         "-back",
                         "-pause",
-                        "-resume",
+                        "-play",
                         "-toggle",
                         "-sessions",
                         "-seek:seconds",
+                        "-exit",
                         "exit"
                     }
                 });
