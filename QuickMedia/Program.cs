@@ -121,23 +121,6 @@ class Program
                 WriteJson(new { status = "Playing" });
                 break;
 
-            /*case "-seek":
-                {
-                    Console.WriteLine("Enter Time");
-                    string? timeInput = Console.ReadLine();
-                    if (long.TryParse(timeInput, out long seconds))
-                    {
-                        long ticks = TimeSpan.FromSeconds(seconds).Ticks;
-                        await session.TryChangePlaybackPositionAsync(ticks);
-                        WriteJson(new { status = "Seeked", position = seconds });
-                    }
-                    else
-                    {
-                        WriteJson(new { error = "Not a Correct input" });
-                    }
-                    break;
-                }*/
-
             case "-sessions":
                 WriteJson(new
                 {
