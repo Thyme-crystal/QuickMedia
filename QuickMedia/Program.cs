@@ -174,7 +174,7 @@ class Program
                         "-resume",
                         "-toggle",
                         "-sessions",
-                        "-seek:<seconds>",
+                        "-seek:seconds",
                         "exit"
                     }
                 });
