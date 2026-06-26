@@ -18,11 +18,11 @@ class Program
             string? input = Console.ReadLine();
             if (input == null) break;
             input = input.Trim().ToLower();
-            if (string.IsNullOrEmpty(input) || input == "exit") break;
+            if (string.IsNullOrEmpty(input) || (input == "exit" || input == "-exit")) break;
 
             try
             {
-                ProcessComand(input).ConfigureAwait(false).GetAwaiter().GetResult();
+                ProcessCommand(input).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -31,9 +31,9 @@ class Program
         }
     }
 
-    private static async Task ProcessComand(string command)
+    private static async Task ProcessCommand(string command)
     {
-        var session = _manager.GetCurrentSession() ?? (_manager.GetSessions().Count > 0 ? _manager.GetSessions()[0] : null);
+        var session = _manager?.GetCurrentSession() ?? (_manager?.GetSessions().Count > 0 ? _manager.GetSessions()[0] : null);
 
         if (session == null)
         {
@@ -121,34 +121,17 @@ class Program
                 WriteJson(new { status = "Playing" });
                 break;
 
-            /*case "-seek":
-                {
-                    Console.WriteLine("Enter Time");
-                    string? timeInput = Console.ReadLine();
-                    if (long.TryParse(timeInput, out long seconds))
-                    {
-                        long ticks = TimeSpan.FromSeconds(seconds).Ticks;
-                        await session.TryChangePlaybackPositionAsync(ticks);
-                        WriteJson(new { status = "Seeked", position = seconds });
-                    }
-                    else
-                    {
-                        WriteJson(new { error = "Not a Correct input" });
-                    }
-                    break;
-                }*/
-
             case "-sessions":
                 WriteJson(new
                 {
-                    Count = _manager.GetSessions().Count
+                    Count = _manager?.GetSessions().Count
                 });
                 break;
 
             case "-currentsession":
                 WriteJson(new
                 {
-                   CurrentSession = _manager.GetCurrentSession()
+                   CurrentSession = _manager?.GetCurrentSession()
                 });
                 break;
 
@@ -166,10 +149,11 @@ class Program
                         "-skip",
                         "-back",
                         "-pause",
-                        "-resume",
+                        "-play",
                         "-toggle",
                         "-sessions",
-                        "-seek:<seconds>",
+                        "-seek:seconds",
+                        "-exit",
                         "exit"
                     }
                 });
