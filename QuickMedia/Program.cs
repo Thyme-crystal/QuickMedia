@@ -11,12 +11,7 @@ class Program
     [MTAThread]
     static void Main()
     {
-        _manager = GlobalSystemMediaTransportControlsSessionManager
-            .RequestAsync()
-            .AsTask()
-            .ConfigureAwait(false)
-            .GetAwaiter()
-            .GetResult();
+        _manager = GlobalSystemMediaTransportControlsSessionManager.RequestAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
 
         while (true)
         {
